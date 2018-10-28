@@ -17,7 +17,7 @@ img1 = Image.open(path1)
 img1 = np.array(img1)[..., :3]
 gray1 = rgb2gray(img1)
 
-max_pts = 50
+max_pts = 100
 
 cimg1 = corner_detector(gray1)
 x1, y1, rmax1 = anms(cimg1, max_pts)
