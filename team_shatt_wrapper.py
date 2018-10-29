@@ -66,22 +66,22 @@ matches2 = match[match >= 0].astype(int)
 # plt.show()
 
 ##########
-# # Plot both images with interest points side by side
-# fig, (left, right) = plt.subplots(1, 2, sharey=True)
+# Plot both images with interest points side by side
+fig, (left, right) = plt.subplots(1, 2, sharey=True)
 
-# left.imshow(img1)
-# left.scatter(x1, y1)
+left.imshow(img1)
+left.scatter(x1, y1)
 # for i in range(boxes1.shape[2]):
 # 	left.plot(boxes1[:,0,i], boxes1[:,1,i], color="red")
 # 	left.plot(oris1[0,:,i], oris1[1,:,i], color="green")
 
-# right.imshow(img2)
-# right.scatter(x2, y2)
+right.imshow(img2)
+right.scatter(x2, y2)
 # for i in range(boxes2.shape[2]):
 # 	right.plot(boxes2[:,0,i], boxes2[:,1,i], color="red")
 # 	right.plot(oris2[0,:,i], oris2[1,:,i], color="green")
 
-# plt.show()
+plt.show()
 ##########
 
 # fig, (left, right) = plt.subplots(1, 2, sharey=True)

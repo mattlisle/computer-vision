@@ -13,5 +13,9 @@
 '''
 
 def corner_detector(img):
+	import numpy as np
 	from skimage.feature import corner_harris
-	return corner_harris(img, k=0.02, sigma=1.4)
+	
+	img = np.pad(img, ((20, 20), (20, 20)), mode="symmetric")
+	cimg = corner_harris(img, k=0.02, sigma=1.4)
+	return cimg[20:-20, 20:-20]
