@@ -36,9 +36,10 @@ def feat_desc(img, x, y):
 
   # Create gaussian filtered image to sample from of size 5 x 5
   # filtered = filters.gaussian_filter(padded, sigma=1, mode="same", truncate=2)
-  G = signal.gaussian(25, 1).reshape(5, 5)
+  G = signal.gaussian(9, 1).reshape(3, 3)
   filtered = signal.convolve2d(padded, G, mode="same")
-
+  # filtered = padded
+  
   # Get orientations of interest points for to rotate sampling window
   dx_img, dy_img = np.gradient(filtered, axis=(1, 0))
   ori = np.arctan2(dy_img, dx_img)
