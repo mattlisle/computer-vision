@@ -36,9 +36,9 @@ def feat_desc(img, x, y):
 
   # Create gaussian filtered image to sample from of size 5 x 5
   # filtered = filters.gaussian_filter(padded, sigma=1, mode="same", truncate=2)
-  G = signal.gaussian(9, 1).reshape(3, 3)
-  filtered = signal.convolve2d(padded, G, mode="same")
-  # filtered = padded
+  # G = signal.gaussian(25, 1).reshape(5, 5)
+  # filtered = signal.convolve2d(padded, G, mode="same")
+  filtered = padded
   
   # Get orientations of interest points for to rotate sampling window
   dx_img, dy_img = np.gradient(filtered, axis=(1, 0))
@@ -57,8 +57,8 @@ def feat_desc(img, x, y):
 
     # Create a rotation matrix by which we will rotate the meshgrid
     theta = -ori[y[j], x[j]]
-    if j == 0:
-      print(theta, ori[y[j], x[j]], y[j], x[j])
+    # if j == 0:
+    #   print(theta, ori[y[j], x[j]], y[j], x[j])
     R = np.array([[np.cos(theta), np.sin(theta)], [-np.sin(theta), np.cos(theta)]])
     rotx, roty = np.einsum('ji, mni -> jmn', -R, np.dstack([defx, defy]))
 
@@ -69,8 +69,8 @@ def feat_desc(img, x, y):
     # For plotting boxes and orientations around interest points
     boxes[:, :, j] = np.dstack([thisx[xcorners, ycorners], thisy[xcorners, ycorners]]) - 18
     oris[:, :, j] = np.array([[x[j], x[j] + 50 * np.cos(-theta)], [y[j], y[j] + 50 * np.sin(-theta)]]) - 18
-    if j == 0:
-      print(theta, oris[:,:,j])
+    # if j == 0:
+    #   print(theta, oris[:,:,j])
 
     # Get the pixel values at those locations
     values = interp2(img, thisx, thisy)

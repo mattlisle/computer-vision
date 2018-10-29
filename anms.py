@@ -51,7 +51,7 @@ def anms(cimg, max_pts):
   # Initialize x and y with locations where points clear 4 nearest neighbors
   y, x = np.where(max_locs)
   values = cimg[max_locs]
-  print(len(values))
+  # print(len(values))
 
   # Sort these values in decreasing order
   sorter = np.argsort(-values)
