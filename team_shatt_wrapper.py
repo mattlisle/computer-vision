@@ -12,6 +12,7 @@ from corner_detector import corner_detector
 from anms import anms
 from feat_desc import feat_desc
 from feat_match import feat_match
+from ransac_est_homography import ransac_est_homography
 
 print("---------- Processing First Image ----------")
 path1 = "intersection1500-1.jpg"
@@ -52,11 +53,19 @@ x2, y2, rmax2 = anms(cimg2, max_pts)
 print("Finding descriptors")
 descs2, boxes2, oris2, ori2 = feat_desc(gray2, x2, y2)
 
-print("---------- Stitching Images ----------")
+print("---------- Matching 1st and 2nd Image ----------")
 print("Finding matching descriptors")
 match = feat_match(descs1, descs2)
 matches1 = np.where([match >= 0])[1].astype(int)
 matches2 = match[match >= 0].astype(int)
+
+print("Performing RANSAC")
+x1 = x1[matches1]
+x2 = x2[matches2]
+y1 = y1[matches1]
+y2 = y2[matches2]
+thresh = 20
+H, inlier_ind = ransac_est_homography(x1, y1, x2, y2, thresh)
 
 # plt.imshow(img2)
 # plt.scatter(x2, y2)
@@ -105,7 +114,7 @@ my = np.zeros(2)
 
 plt.imshow(both)
 plt.scatter(x1[matches1], y1[matches1])
-plt.scatter(x2[matches2] + img2.shape[1], y2[matches2], color="blue")
+plt.scatter(x2[matches2] + img2.shape[1], y2[matches2], color="C0")
 for i in matches1:
 	plt.plot(boxes1[:,0,i], boxes1[:,1,i], color="red")
 	plt.plot(oris1[0,:,i], oris1[1,:,i], color="green")

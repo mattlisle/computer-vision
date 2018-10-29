@@ -16,5 +16,13 @@
 '''
 
 def ransac_est_homography(x1, y1, x2, y2, thresh):
-  # Your Code Here
+  import numpy as np
+  from est_homography import est_homography
+  
+  # Number of RANSAC trials
+  t = 100
+
+  # Length of matching points arrays
+  n = len(x1)
+
   return H, inlier_ind

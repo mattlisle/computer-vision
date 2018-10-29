@@ -15,9 +15,6 @@
     - Output rmax: suppression radius used to get max pts corners.
 '''
 
-# Remaining elements to implement
-# 1. Make argrelextrema work on values 0.9 as large - investigate rank filtering
-# 2. I forget the second...
 
 def anms(cimg, max_pts):
   import numpy as np
@@ -32,10 +29,11 @@ def anms(cimg, max_pts):
 
   # ---------- Part 1: Find points that are local maxima --------- #
   # Define 4 kernels that will allow us to compare to 4-nearest pixel neighbors
-  left  = np.array([ 0, 0.9, -1]).reshape(1, 3)
-  right = np.array([-1, 0.9,  0]).reshape(1, 3)
-  up    = np.array([ 0, 0.9, -1]).reshape(3, 1)
-  down  = np.array([-1, 0.9,  0]).reshape(3, 1)
+  # Switched from 0.9 to 1 and got better performance
+  left  = np.array([ 0, 1, -1]).reshape(1, 3)
+  right = np.array([-1, 1,  0]).reshape(1, 3)
+  up    = np.array([ 0, 1, -1]).reshape(3, 1)
+  down  = np.array([-1, 1,  0]).reshape(3, 1)
 
   # Generate comparison array, one array along 0th dim for each neighbor
   comps = np.zeros((4, h, w))
@@ -51,7 +49,11 @@ def anms(cimg, max_pts):
   # Initialize x and y with locations where points clear 4 nearest neighbors
   y, x = np.where(max_locs)
   values = cimg[max_locs]
-  # print(len(values))
+
+  # Debugging print statement
+  total = cimg.shape[0] * cimg.shape[1]
+  maxes = len(values)
+  print("%d maxima from %d points" % (maxes, total))
 
   # Sort these values in decreasing order
   sorter = np.argsort(-values)

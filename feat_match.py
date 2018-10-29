@@ -15,6 +15,7 @@
 '''
 
 # Documentation on annoy: https://pypi.org/project/annoy/
+# Something to consider when debugging RANSAC: the ratios don't have to be the same both ways
 def feat_match(descs1, descs2):
   import numpy as np
   from annoy import AnnoyIndex
@@ -50,40 +51,33 @@ def feat_match(descs1, descs2):
     ind, dist = forward.get_nns_by_item(0, n2 + 1, include_distances=True)
     ratio = dist[1] / dist[2]
 
-    # If it passes the 0.7 test, we need to check going backwards as well
-    if ratio < 0.7:
+    # If it passes the ratio test, we need to check going backwards as well
+    if ratio < 0.95:
       k = ind[1] - 1
 
+      # Construct the backward tree for the candidate point in descs2
       backward = AnnoyIndex(h)
       backward.add_item(0, descs2[:, k])
 
+      # Add all the elements in descs1
       for j in range(n1):
         backward.add_item(j + 1, descs1[:, j])
 
+      # Run nearest neighbors
       backward.build(trees)
       ind, dist = backward.get_nns_by_item(0, n1 + 1, include_distances=True)
       ratio = dist[1] / dist[2]
 
-      if (ind[1] - 1 == i) and (ratio < 0.7): 
+      # If it passes both tests, we're good to go
+      if (ind[1] - 1 == i) and (ratio < 0.95): 
         found += 1
         print("Found %d matches..." % found, end="\r", flush=True)
         match[i] = k
 
-  # Brute force code to compare against tree search
-  # Right now, they output very different values
-  # match = -np.ones((n1, 1))
-  # dist = np.zeros(n2)
-  # for i in range(n1):
-  #   for j in range(n2):
-  #     dist[j] = np.sum(np.square(descs1[:, i] - descs2[:, j]))
-  #   best = np.amin(dist)
-  #   dist[dist == best] = np.nan_to_num(np.Inf)
-  #   second = np.amin(dist)
-  #   if (best / second) < 0.7:
-  #     match[i] = np.where(dist == np.nan_to_num(np.Inf))[0][0]
-
+  # Debugging statments
   end = time.time()
   elasped = int(end - start)
   print("Found %d matches..." % found)
   print("Time to find matches: %d seconds" % elasped)
+
   return match
