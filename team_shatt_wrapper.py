@@ -20,7 +20,7 @@ img1 = Image.open(path1)
 img1 = np.array(img1)[..., :3]
 gray1 = rgb2gray(img1)
 
-max_pts = 1000
+max_pts = 2000
 
 print("Detecting corners")
 cimg1 = corner_detector(gray1)
@@ -64,7 +64,7 @@ x1m = x1[matches1]
 x2m = x2[matches2]
 y1m = y1[matches1]
 y2m = y2[matches2]
-thresh = 20
+thresh = 0.5
 H, inlier_ind = ransac_est_homography(x1m, y1m, x2m, y2m, thresh)
 xin1 = x1m[inlier_ind]
 xin2 = x2m[inlier_ind]
