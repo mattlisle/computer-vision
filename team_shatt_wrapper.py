@@ -29,7 +29,7 @@ print("Suppressing non maxima")
 x1, y1, rmax1 = anms(cimg1, max_pts)
 
 print("Finding descriptors")
-descs1, boxes1, oris1, ori1 = feat_desc(gray1, x1, y1)
+descs1 = feat_desc(gray1, x1, y1)
 
 # plt.imshow(img1)
 # plt.scatter(x1, y1)
@@ -51,7 +51,7 @@ print("Suppressing non maxima")
 x2, y2, rmax2 = anms(cimg2, max_pts)
 
 print("Finding descriptors")
-descs2, boxes2, oris2, ori2 = feat_desc(gray2, x2, y2)
+descs2 = feat_desc(gray2, x2, y2)
 
 print("---------- Matching 1st and 2nd Image ----------")
 print("Finding matching descriptors")
@@ -64,7 +64,7 @@ x1m = x1[matches1]
 x2m = x2[matches2]
 y1m = y1[matches1]
 y2m = y2[matches2]
-thresh = 0.5
+thresh = .7
 H, inlier_ind = ransac_est_homography(x1m, y1m, x2m, y2m, thresh)
 xin1 = x1m[inlier_ind]
 xin2 = x2m[inlier_ind]
