@@ -54,6 +54,10 @@ def ransac_est_homography(x1, y1, x2, y2, thresh):
         found = len(ind)
         print("Found %d matches..." % found, end="\r", flush=True)
         inlier_ind = ind
+        dist = distances
+        Hout = H
+
+  # Run least squares on the inliers to get the most reliable estimate of H
 
   print("Found %d matches..." % found)
-  return H, inlier_ind
+  return Hout, inlier_ind

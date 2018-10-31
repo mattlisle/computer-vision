@@ -65,4 +65,45 @@ def interp2(v, xq, yq):
 	return interp_val
 
 
+def warp_image(img, H, corners):
+	import numpy as np
+	from scipy.ndimage import map_coordinates
+	import matplotlib.pyplot as plt
+	import math
 
+	xmin = math.floor(np.amin(corners[0]))
+	xmax = math.ceil(np.amax(corners[0]))
+	ymin = math.floor(np.amin(corners[1]))
+	ymax = math.ceil(np.amax(corners[1]))
+
+	x, y = np.meshgrid(np.arange(xmin, xmax), np.arange(ymin, ymax))
+	h, w = x.shape
+
+	# print(xmin, xmax, ymin, ymax)
+
+	# plt.imshow(x)
+	# plt.show()
+
+	# Assignment suggested geometric_transform for this part, but I dunno how to use it, so I'll just brute-force vectorize
+	pts = np.stack([x.reshape(h*w), y.reshape(h*w), np.ones(h*w)])
+
+	# Hinv = np.linalg.inv(H)
+	# Hinv = Hinv / Hinv[-1, -1]
+	# print(corners.astype(int), np.matmul(Hinv, corners).astype(int))
+
+	transformed = np.zeros((3, h * w))
+	transformed = np.matmul(H, pts)
+	transformed = transformed / transformed[2]
+
+	# t = transformed.astype(int)
+	# plt.imshow(t[0].reshape(h, w))
+
+	# h1, w1, d1 = img.shape
+	# testx, testy = np.meshgrid(np.arange(0, w1), np.arange(0, h1))
+
+	warped = np.zeros((h, w, 3))
+	for c in range(3):
+		# warped[..., c] = map_coordinates(img[..., c], [testy.reshape(h1*w1), testx.reshape(h1*w1)]).reshape(h1, w1)
+		warped[..., c] = map_coordinates(img[..., c], [transformed[1], transformed[0]]).reshape(h, w)
+
+	return warped

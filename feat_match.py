@@ -52,7 +52,7 @@ def feat_match(descs1, descs2):
     ratio = dist[1] / dist[2]
 
     # If it passes the ratio test, we need to check going backwards as well
-    if ratio < 0.8:
+    if ratio < 0.9:
       k = ind[1] - 1
 
       # Construct the backward tree for the candidate point in descs2
@@ -69,7 +69,7 @@ def feat_match(descs1, descs2):
       ratio = dist[1] / dist[2]
 
       # If it passes both tests, we're good to go
-      if (ind[1] - 1 == i) and (ratio < 0.8): 
+      if (ind[1] - 1 == i) and (ratio < 0.9): 
         found += 1
         print("Found %d matches..." % found, end="\r", flush=True)
         match[i] = k
