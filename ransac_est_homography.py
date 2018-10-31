@@ -18,6 +18,8 @@
 def ransac_est_homography(x1, y1, x2, y2, thresh):
   import numpy as np
   from est_homography import est_homography
+  from scipy.optimize import least_squares
+  from helpers import inlier_cost_func
   
   # Number of RANSAC trials
   t = 1000
@@ -28,7 +30,7 @@ def ransac_est_homography(x1, y1, x2, y2, thresh):
   z = np.ones(n)
 
   inlier_ind = np.array([])
-  while len(inlier_ind) <= 10 and c < 20: 
+  while len(inlier_ind) <= 10 and c < 10: 
     c += 1
 
     for i in range(t):
@@ -55,9 +57,14 @@ def ransac_est_homography(x1, y1, x2, y2, thresh):
         print("Found %d matches..." % found, end="\r", flush=True)
         inlier_ind = ind
         dist = distances
-        Hout = H
+        Hbest = H
 
   # Run least squares on the inliers to get the most reliable estimate of H
+  xin = np.stack([x1[inlier_ind], y1[inlier_ind], np.ones(len(inlier_ind))])
+  yin = np.stack([x2[inlier_ind], y2[inlier_ind], np.ones(len(inlier_ind))])
+  H = least_squares(inlier_cost_func, Hbest.reshape(9), args=(xin, yin))["x"].reshape(3, 3)
+
+  print(H - Hbest)
 
   print("Found %d matches..." % found)
-  return Hout, inlier_ind
+  return H, inlier_ind

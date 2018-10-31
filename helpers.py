@@ -87,12 +87,12 @@ def warp_image(img, H, corners):
 	# Assignment suggested geometric_transform for this part, but I dunno how to use it, so I'll just brute-force vectorize
 	pts = np.stack([x.reshape(h*w), y.reshape(h*w), np.ones(h*w)])
 
-	# Hinv = np.linalg.inv(H)
-	# Hinv = Hinv / Hinv[-1, -1]
+	Hinv = np.linalg.inv(H)
+	Hinv = Hinv / Hinv[-1, -1]
 	# print(corners.astype(int), np.matmul(Hinv, corners).astype(int))
 
 	transformed = np.zeros((3, h * w))
-	transformed = np.matmul(H, pts)
+	transformed = np.matmul(Hinv, pts)
 	transformed = transformed / transformed[2]
 
 	# t = transformed.astype(int)
@@ -106,4 +106,16 @@ def warp_image(img, H, corners):
 		# warped[..., c] = map_coordinates(img[..., c], [testy.reshape(h1*w1), testx.reshape(h1*w1)]).reshape(h1, w1)
 		warped[..., c] = map_coordinates(img[..., c], [transformed[1], transformed[0]]).reshape(h, w)
 
-	return warped
+	return warped.astype(int), ymin, xmax - xmin, ymax - ymin
+
+
+def inlier_cost_func(H, x, y):
+	import numpy as np
+
+	H = H.reshape(3, 3)
+	estimates = np.matmul(H, x)
+	residuals = y - estimates / estimates[2]
+
+	h, num_inliers = x.shape
+
+	return residuals.reshape(h * num_inliers)

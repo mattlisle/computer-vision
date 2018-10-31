@@ -11,9 +11,12 @@ from mymosaic import mymosaic
 
 # I'm going to use 3 x H x W x D array for images
 # May want to double check this is the right format at debug session
-paths = ["intersection1500-1.jpg", "intersection1500-2.jpg", "intersection1500-3.jpg"]
+paths = ["street-1.jpg", "street-2.jpg", "street-3.jpg"]
 img_input = np.zeros(3, dtype=object)
 for i in range(3):
 	img_input[i] = np.array(Image.open(paths[i]))
 
-H, corners = mymosaic(img_input)
+img_mosaic = mymosaic(img_input)
+
+plt.imshow(img_mosaic)
+plt.show()

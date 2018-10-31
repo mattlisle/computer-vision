@@ -16,16 +16,18 @@
 def mymosaic(img_input):
   import numpy as np
   from helpers import rgb2gray
+  from helpers import warp_image
   from corner_detector import corner_detector
   from anms import anms
   from feat_desc import feat_desc
   from feat_match import feat_match
   from ransac_est_homography import ransac_est_homography
+  import matplotlib.pyplot as plt
   import math
   
   # Set out constants
   max_pts = 2000
-  thresh = 5
+  thresh = 0.5
   h, w, d = img_input[0].shape
 
   # ---------- Part 1: Get descs for each image ---------- #
@@ -63,8 +65,13 @@ def mymosaic(img_input):
   for i in [0, 2]:
     print("---------- Matching Images %d and %d ----------" % (i + 1, 2))
     print("Finding matching descriptors")
-    match = feat_match(descs[1], descs[i])
-    matches = (np.where([match >= 0])[1], match[match >= 0])  # Potential bug
+    try:
+      match = np.load("match%d.npy" % i)
+    except FileNotFoundError:
+      match = feat_match(descs[1], descs[i])
+      np.save("match%d" % i, match)
+    
+    matches = (np.where([match >= 0])[1], match[match >= 0])
 
     print("Performing RANSAC")
     H[i], inlier_ind[i] = ransac_est_homography(x[i][matches[1]], y[i][matches[1]], x[1][matches[0]], y[1][matches[0]], thresh)
@@ -79,15 +86,35 @@ def mymosaic(img_input):
   xmax = int(math.ceil(np.amax(corners[2][0])))
   ymin = int(math.floor(np.amin([np.amin(corners[0][1]), np.amin(corners[2][1])])))
   ymax = int(math.ceil(np.amax([np.amax(corners[0][1]), np.amax(corners[2][1])])))
-  origin = np.array([-xmin, -ymin])
-  print(xmin, xmax, ymin, ymax)
-  # img_mosaic = np.zeros((ymax - ymin, xmax - xmin, 3))
-
-  return H, corners
+  img_mosaic = np.zeros((ymax - ymin, xmax - xmin, 3)).astype(int)
 
   # Need to find the mesh to interpolate with
-  img_mosaic[0] = warp_image(img_input[0], H[0], corners[0])
-  img_mosaic[1] = image_input[1]
-  img_mosaic[2] = warp_image(img_input[2], H[2], corners[2])
+  left, yi0, w0, h0   = warp_image(img_input[0], H[0], corners[0])
+  center = img_input[1]
+  right, yi2, w2, h2  = warp_image(img_input[2], H[2], corners[2])
+  
+  # Need the offsets to correctly align images
+  xi1 = -xmin
+  yi1 = -ymin
+  w1 = w
+  h1 = h
 
+  # Assemble the mosaic
+  img_mosaic[yi1: yi1 + h1, xi1: xi1 + w1] = center.astype(int)
+  plt.imshow(img_mosaic)
+  plt.show()
+  if yi0 < yi2:
+    img_mosaic[:h0, :w0][left > 0] = left[left > 0]
+    plt.imshow(img_mosaic)
+    plt.show()
+    img_mosaic[yi2 - yi0: h2 + yi2 - yi0, -w2 - 1: -1][right > 0] = right[right > 0]
+    plt.imshow(img_mosaic)
+    plt.show()
+  else:
+    img_mosaic[yi0 - yi2: h0 + yi0 - yi2, :w0][left > 0] = left[left > 0]
+    plt.imshow(img_mosaic)
+    plt.show()
+    img_mosaic[:h2, -w2 - 1: -1][right > 0] = right[right > 0]
+    plt.imshow(img_mosaic)
+    plt.show()
   return img_mosaic

@@ -15,7 +15,7 @@ from feat_match import feat_match
 from ransac_est_homography import ransac_est_homography
 
 print("---------- Processing First Image ----------")
-path1 = "1L.jpg"
+path1 = "street-2.jpg"
 img1 = Image.open(path1)
 img1 = np.array(img1)[..., :3]
 gray1 = rgb2gray(img1)
@@ -39,7 +39,7 @@ descs1 = feat_desc(gray1, x1, y1)
 # plt.show()
 
 print("---------- Processing Second Image ----------")
-path2 = "1M.jpg"
+path2 = "street-3.jpg"
 img2 = Image.open(path2)
 img2 = np.array(img2)[..., :3]
 gray2 = rgb2gray(img2)
