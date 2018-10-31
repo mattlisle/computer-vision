@@ -64,7 +64,5 @@ def ransac_est_homography(x1, y1, x2, y2, thresh):
   yin = np.stack([x2[inlier_ind], y2[inlier_ind], np.ones(len(inlier_ind))])
   H = least_squares(inlier_cost_func, Hbest.reshape(9), args=(xin, yin))["x"].reshape(3, 3)
 
-  print(H - Hbest)
-
   print("Found %d matches..." % found)
   return H, inlier_ind

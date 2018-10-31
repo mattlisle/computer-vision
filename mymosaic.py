@@ -26,7 +26,7 @@ def mymosaic(img_input):
   import math
   
   # Set out constants
-  max_pts = 2000
+  max_pts = 1000
   thresh = 0.5
   h, w, d = img_input[0].shape
 
@@ -81,6 +81,7 @@ def mymosaic(img_input):
     corners[i] = warped_corners / warped_corners[2]
 
   # ---------- Part 3: Assemble the mosaic ---------- #
+  print("---------- Assembling the Mosaic ----------")
   # Initialize the mosaic using corners
   xmin = int(math.floor(np.amin(corners[0][0])))
   xmax = int(math.ceil(np.amax(corners[2][0])))
@@ -89,6 +90,7 @@ def mymosaic(img_input):
   img_mosaic = np.zeros((ymax - ymin, xmax - xmin, 3)).astype(int)
 
   # Need to find the mesh to interpolate with
+  print("Warping images")
   left, yi0, w0, h0   = warp_image(img_input[0], H[0], corners[0])
   center = img_input[1]
   right, yi2, w2, h2  = warp_image(img_input[2], H[2], corners[2])
@@ -100,21 +102,12 @@ def mymosaic(img_input):
   h1 = h
 
   # Assemble the mosaic
+  print("Putting it all together")
   img_mosaic[yi1: yi1 + h1, xi1: xi1 + w1] = center.astype(int)
-  plt.imshow(img_mosaic)
-  plt.show()
   if yi0 < yi2:
     img_mosaic[:h0, :w0][left > 0] = left[left > 0]
-    plt.imshow(img_mosaic)
-    plt.show()
     img_mosaic[yi2 - yi0: h2 + yi2 - yi0, -w2 - 1: -1][right > 0] = right[right > 0]
-    plt.imshow(img_mosaic)
-    plt.show()
   else:
     img_mosaic[yi0 - yi2: h0 + yi0 - yi2, :w0][left > 0] = left[left > 0]
-    plt.imshow(img_mosaic)
-    plt.show()
     img_mosaic[:h2, -w2 - 1: -1][right > 0] = right[right > 0]
-    plt.imshow(img_mosaic)
-    plt.show()
   return img_mosaic
