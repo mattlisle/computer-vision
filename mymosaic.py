@@ -92,7 +92,7 @@ def mymosaic(img_input):
   # Need to find the mesh to interpolate with
   print("Warping images")
   left, yi0, w0, h0   = warp_image(img_input[0], H[0], corners[0])
-  center = img_input[1]
+  center = img_input[1].astype(int)
   right, yi2, w2, h2  = warp_image(img_input[2], H[2], corners[2])
   
   # Need the offsets to correctly align images
@@ -103,11 +103,12 @@ def mymosaic(img_input):
 
   # Assemble the mosaic
   print("Putting it all together")
-  img_mosaic[yi1: yi1 + h1, xi1: xi1 + w1] = center.astype(int)
   if yi0 < yi2:
     img_mosaic[:h0, :w0][left > 0] = left[left > 0]
     img_mosaic[yi2 - yi0: h2 + yi2 - yi0, -w2 - 1: -1][right > 0] = right[right > 0]
   else:
     img_mosaic[yi0 - yi2: h0 + yi0 - yi2, :w0][left > 0] = left[left > 0]
     img_mosaic[:h2, -w2 - 1: -1][right > 0] = right[right > 0]
+  img_mosaic[yi1: yi1 + h1, xi1: xi1 + w1] = center
+
   return img_mosaic
